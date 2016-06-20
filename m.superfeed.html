@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, width=device-width, target-densitydpi=medium-dpi">
+    <title></title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="오늘 눈팅 여기서 끝! SNS 눈팅 컨텐츠 모음">
+    <link rel="image_src" href="ssets/img/@video.png" />    
+    <link rel="icon" href="assets/img/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="assets/css/normalize.css">
+    <link rel="stylesheet" href="assets/css/superfeed_m.css">
+    <script src="assets/js/jquery-2.2.4.min.js"></script>
+    <script src="http://maps.google.com/maps/api/js?v=3.3&sensor=true"></script>
+    <script>
+        //전체 변수 정의
+        var variable = {
+            screenW : $(window).outerWidth(),
+            screenH : $(window).outerHeight(),
+            android : navigator.userAgent.match(/Android/i),
+            dur : function() {
+                return variable.android == 'Android' ? 20 : 40
+            },
+            nav : false,
+            section05Num : 1,
+            section06Num : 1,
+            startScroll : null,
+            scrollEnd : true
+        };
+
+        $(document).ready(function() {
+            //화면 높이 정렬
+            resize();
+
+            //네비게이션 클릭 했을 때 해당 섹션으로 이동
+            $('#header .nav a').click(function() {
+                if (location.pathname.replace(/^\//,'') == this.pathname.replace(/^\//,'') && location.hostname == this.hostname) {
+                    var target = $(this.hash);
+                    target = target.length ? target : $('[name=' + this.hash.slice(1) +']');
+                    if (target.length) {
+                        $('html, body').animate({
+                            scrollTop: target.offset().top-50
+                        }, 700);
+                        return false;
+                    }
+                }
+            });
+
+            //인기있는 향연 슈퍼피드 화살표 클릭 이벤트(section03)
+            $('#section03 a').on('click', function() {
+                if($(this).hasClass('arrow_prev')) {
+                    $('#section03 .device_cont').css({webkitTransform: 'translate3d(0, 0, 0)'})
+                } else {
+                    $('#section03 .device_cont').css({webkitTransform: 'translate3d(0, -1097px, 0)'})
+                }
+            });
+
+            //아주 순수한 콘텐츠 모음(section04)
+            $('#section04 a').on('click', function() {
+                if($(this).hasClass('arrow_prev')) {
+                    $('#section04 .device_cont').css({webkitTransform: 'translate3d(0, 0, 0)'})
+                } else {
+                    $('#section04 .device_cont').css({webkitTransform: 'translate3d(0, -505px, 0)'})
+                }
+            });
+
+            //매일매일 업데이트...(section05)
+            $('#section05 a').on('click', function() {
+                if($(this).hasClass('arrow_prev')) {
+                    if(variable.section05Num == 1) return
+                    variable.section05Num--
+                $('#section05 .device_nav li').eq(variable.section05Num-1).addClass('on').siblings('li').removeClass('on');
+                } else {
+                    if(variable.section05Num == 4) return
+                    $('#section05 .device_nav li').eq(variable.section05Num).addClass('on').siblings('li').removeClass('on');
+                    variable.section05Num++
+                }
+
+                $('#section05 .device_nav .bar').css({webkitTransform: 'translate3d('+ $('#section05 .device_nav .bar').outerWidth()*(variable.section05Num-1) +'px, 0, 0)', webkitTransition: 'all 400ms'})
+                $('#section05 .device_cont .img').css({webkitTransform: 'translate3d(-'+ 173*(variable.section05Num-1) +'px, 0, 0)', webkitTransition: 'all 400ms'});
+            });
+
+            //랜덤버튼...(section06)
+            $('#section06 a.random').on('click', function() {
+                if(variable.section06Num == 10) {
+                    variable.section06Num = 0;
+                    $('#section06 .device_cont li').eq(9).css({zIndex: 1});
+                };
+
+                $('#section06 .device_cont li').eq(variable.section06Num).css({webkitTransform : 'translate3d(0, -275px, 0)', zIndex: 2}).siblings('li').delay(600).queue(function (next) {
+                        $(this).css({zIndex: 1, webkitTransform: 'translate3d(0, 0, 0)'});
+                        next(); 
+                });
+
+                variable.section06Num++;
+            });
+
+            variable.startScroll = $(window).scrollTop();
+
+            $('body').on('touchstart touchend', function(e) {
+                if(e.type == 'touchstart') {
+                    variable.scrollEnd = false;
+                } else {
+                    variable.scrollEnd = true;
+                    $('.txt').css({webkitTransform: 'translate3d(0, 0, 0)', webkitTransition: 'all 300ms ease'});
+                }
+            });
+        });
+
+        $(window).load(function() {
+            variable.startScroll = $(window).scrollTop();
+        });
+
+        // $(window).resize(function() {
+        //     resize();
+        // });
+
+        //스크롤시 네비게이션 이벤트
+        $(window).scroll(function(e) {
+            if($(window).scrollTop() >= $('#section02').offset().top-50 && variable.nav == false) {
+                $('#header').css({webkitTransform: 'translate3d(0, 0, 0)'});
+                $('.video').css({webkitTransform: 'translate3d(0, -100%, 0)'});
+                variable.nav = true;
+            } else if($(window).scrollTop() < $('#section02').offset().top-50) {
+                $('#header').css({webkitTransform: 'translate3d(0, -50px, 0)'});
+                $('.video').css({webkitTransform: 'translate3d(0, 0, 0)'});
+                variable.nav = false;
+            };
+
+            if($(window).scrollTop() >= $('#section02').offset().top-50 && $(window).scrollTop() < $('#section03').offset().top-50) {
+                scrollNav(2);
+            } else if($(window).scrollTop() >= $('#section03').offset().top-50 && $(window).scrollTop() < $('#section04').offset().top-50) {
+                scrollNav(3);
+            } else if($(window).scrollTop() >= $('#section04').offset().top-50 && $(window).scrollTop() < $('#section05').offset().top-50) {
+                scrollNav(4);
+            } else if($(window).scrollTop() >= $('#section05').offset().top-50 && $(window).scrollTop() < $('#section06').offset().top-50) {
+                scrollNav(5);
+            } else if($(window).scrollTop() >= $('#section06').offset().top-50 && $(window).scrollTop() < $('#contact').offset().top-50) {
+                scrollNav(6);
+            } else if($(window).scrollTop() >= $('#contact').offset().top-50 && $(window).scrollTop() < $('#contact').offset().top) {
+                scrollNav(7);
+            }
+
+            var scroll = $(window).scrollTop() - variable.startScroll;
+
+            if(scroll < 0 && variable.scrollEnd == false) {
+                $('.txt').css({webkitTransform: 'translate3d(0, -'+ variable.dur() +'px, 0)', webkitTransition: 'all 300ms ease-in'});
+            } else if(scroll > 0 && variable.scrollEnd == false) {
+                $('.txt').css({webkitTransform: 'translate3d(0, '+ variable.dur() +'px, 0)', webkitTransition: 'all 300ms ease-in'});
+            };
+
+            variable.startScroll = $(window).scrollTop();
+
+            if(variable.android != null) {
+                clearTimeout( jQuery.data( this, "scrollCheck" ) );
+                jQuery.data( this, "scrollCheck", setTimeout(function() {
+                    variable.scrollEnd = true;
+                    $('.txt').css({webkitTransform: 'translate3d(0, 0, 0)', webkitTransition: 'all 300ms ease'});
+                }, 50) );
+            }
+        });
+
+        //화면 리사이즈 함수
+        function resize() {
+            var screenW = $(window).outerWidth(),
+                screenH = $(window).outerHeight();
+
+            $('#section01').css({minHeight: screenH});
+        };
+
+        //'page'의 숫자를 받아 네비게이션의 html옵션을 제정렬
+        function scrollNav(page) {
+            if(page == 6) {
+                $('.prev a').attr('href', '#section0'+(page-1));
+                $('.next a').attr('href', '#contact');
+            } else {
+                $('.prev a').attr('href', '#section0'+(page-1));
+                $('.next a').attr('href', '#section0'+(page+1));
+            }
+        };
+
+        //구글맵
+        function initialize() {
+            var img = new google.maps.MarkerImage("assets/img/m/map_point.png", null, null, null, new google.maps.Size(60,77));
+            var myLatlng = new google.maps.LatLng(37.4973714, 127.0388653);
+            var myOptions = {
+                zoom: 16,
+                scrollwheel: false,
+                draggable: false,
+                center: myLatlng
+            }
+            map1 = new google.maps.Map(document.getElementById("map-canvas"), myOptions);
+            marker = new google.maps.Marker({
+                position: myLatlng, 
+                map : map1, 
+                icon : img
+            });   
+        }
+
+        google.maps.event.addDomListener(window, 'load', initialize);
+        google.maps.event.addDomListener(window, "resize", function() {
+            var center = map1.getCenter();
+            google.maps.event.trigger(map1, "resize");
+            map1.setCenter(center); 
+        });
+    </script>
+</head>
+<body>
+    <div class="video"></div>
+
+    <div id="wrap"> 
+        <!-- 헤더 -->
+        <header id="header">
+            <h1 class="logo"><img src="assets/img/m/img_logo02.png" alt="SUPER FEED"></h1>
+            <nav class="nav">
+                <ul>
+                    <li class="main"><a href="#section01" title="메인이동">메인</a></li>
+                    <li class="prev"><a href="#section01" title="">이전섹션 이동</a></li>
+                    <li class="next"><a href="#section03" title="">다음섹션 이동</a></li>
+                </ul>
+            </nav>
+        </header>
+    
+        <!-- FUN하고 편하게 -->
+        <section id="section01">
+            <div class="cont">
+                <div class="txt">
+                    <h1 class="logo"><img src="assets/img/m/img_logo.png" alt="SUPER FEED"></h1>
+                    <h2><img src="assets/img/m/txt_main_title.png" alt="FUN하고 편하게"></h2>
+                    <p>
+                        <strong>100만 유저의 핵꿀잼 눈팅 전용 어플!</strong><br>SNS와 커뮤니티의 HOT한 콘텐츠를<br>FUN하게 모아 편하게 즐겨보세요.
+                    </p>
+                    <a href="video/superfeed.mp4" target="_blank" class="cf">CF보기</a>
+                </div>
+                
+                <div class="app">
+                    <a href="https://play.google.com/store/apps/details?id=com.superfeed.android" target="_blank" title="구글 플레이스토어 다운로드 페이지 이동" class="flL"><img src="assets/img/m/img_app_googleplay.png" alt="google play"></a>
+                    <a href="https://itunes.apple.com/kr/app/id1058149651?mt=8" target="_blank" title="애플 앱스토어 다운로드 페이지 이동" class="flR"><img src="assets/img/m/img_app_appstore.png" alt="App Store"></a>
+                </div>
+            </div>
+
+            <a href="#none" class="next"><img src="assets/img/arrow_next01.png" alt="다음 섹션 이동"></a>
+        </section>
+
+        <!-- 모든 SNS와 커뮤니티의 종착지 -->
+        <section id="section02">
+            <div class="txt">
+                <h2>모든 SNS와<br>커뮤니티의 종착지.</h2>
+                <p>여러분이 알고 있는 모든 SNS와 커뮤니티의<br>인기글을 슈퍼피드 하나로 즐겨보세요.</p>
+            </div>
+            
+            <ul class="sns_list">
+                <li><img src="assets/img/m/ico_sns01.png" alt="페이스북"></li>
+                <li><img src="assets/img/m/ico_sns02.png" alt="오늘의 유머"></li>
+                <li><img src="assets/img/m/ico_sns03.png" alt="vonvon"></li>
+                <li><img src="assets/img/m/ico_sns04.png" alt="도탁스"></li>
+                <li><img src="assets/img/m/ico_sns05.png" alt="유튜브"></li>
+                <li><img src="assets/img/m/ico_sns06.png" alt="보배드림"></li>
+                <li><img src="assets/img/m/ico_sns07.png" alt="에펨코리아"></li>
+                <li><img src="assets/img/m/ico_sns08.png" alt="루리웹"></li>
+                <li><img src="assets/img/m/ico_sns09.png" alt="웃긴대학"></li>
+                <li><img src="assets/img/m/ico_sns10.png" alt="카카오스토리"></li>
+                <li><img src="assets/img/m/ico_sns11.png" alt="유머북"></li>
+                <li><img src="assets/img/m/ico_sns12.png" alt="인스타그램"></li>
+                <li><img src="assets/img/m/ico_sns13.png" alt="cirlstory"></li>
+                <li><img src="assets/img/m/ico_sns14.png" alt="네이트판"></li>
+                <li><img src="assets/img/m/ico_sns15.png" alt="DC인사이드"></li>
+                <li><img src="assets/img/m/ico_sns16.png" alt="인스티즈"></li>
+                <li><img src="assets/img/m/ico_sns17.png" alt="YGOSU"></li>
+                <li><img src="assets/img/m/ico_sns18.png" alt="9GAG"></li>
+                <li><img src="assets/img/m/ico_sns19.png" alt="써글"></li>
+                <li><img src="assets/img/m/ico_sns20.png" alt="SLR클럽"></li>
+                <li><img src="assets/img/m/ico_sns21.png" alt="개드립닷컴"></li>
+                <li><img src="assets/img/m/ico_sns22.png" alt="369스토리"></li>
+                <li><img src="assets/img/m/ico_sns23.png" alt="개드립넷"></li>
+                <li><img src="assets/img/m/ico_sns24.png" alt="뽐뿌"></li>
+            </ul>
+        </section>
+
+        <!-- 인기있는 피드의 향연. 슈퍼피드 -->
+        <section id="section03">
+            <div class="txt">
+                <h2>인기있는 피드의 향연<br>슈퍼피드.</h2>
+                <p>오늘 SNS와 커뮤니티에서 가장 인기있는<br>콘텐츠를 실시간으로 받아보세요!<br>센스쟁이 에디터들이 선정한 콘텐츠가<br>곳곳에 숨어 있습니다!</p>
+            </div>
+
+            <div class="device">
+                <h3 class="blind">슈퍼피드 화면 예시 입니다. 다음 섹션인 '아주 특별한 콘텐츠 모음 순수한 직박구리'로 넘어가세요.</h3>
+                <div class="native">
+                    <div class="device_cont">
+                        <img src="assets/img/m/img_device_section02_cont.png" alt="">
+                    </div>
+                </div>
+                <a href="#none" class="arrow_prev">위</a>
+                <a href="#none" class="arrow_next">아래</a>
+            </div>
+        </section>
+
+        <!-- 아주 특별한 콘텐츠 모음 순수한 직박구리 -->
+        <section id="section04">
+            <div class="cont">
+                <div class="txt">
+                    <h2>아주 특별한 콘텐츠 모음<br>순수한 직박구리</h2>
+                    <p>직박구리가 뭔지 다들 잘 알잖아요~<br>나만 쓰레기 아니잖아요~<br>장.인.정.신! 에디터들의 센스가 돋보이는<br>순수한 직박구리의 매력에 퐁당 빠져보세요!</p>
+                </div>
+
+                <div class="device">
+                    <h3 class="blind">슈퍼피드 화면 예시 입니다. 다음 섹션인 '매일 매일 업데이트 되는 SNS 인기순위'로 넘어가세요.</h3>
+                    <div class="native">
+                        <div class="device_cont">
+                            <img src="assets/img/m/img_device_section03_cont.png" alt="">
+                        </div>
+                    </div>
+                    <a href="#none" class="arrow_prev">위</a>
+                    <a href="#none" class="arrow_next">아래</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- 매일 매일 업데이트 되는 SNS 인기순위 -->
+        <section id="section05">
+            <div class="cont">
+                <div class="txt">
+                    <h2>매일 매일 업데이트 되는<br>SNS 인기순위</h2>
+                    <p role="text">내가 사랑하는 ★의 SNS 순위는?<br>더 이상 사칭 계정에 속지말고, SNS계정 없이<br>슈퍼피드 하나로 ★의 일상을 염탐하세요!</p>
+                </div>
+
+                <div class="device">
+                    <h3 class="blind">슈퍼피드 화면 예시 입니다. 다음 섹션인 '세상 모든게 다 귀찮다면 슈퍼 랜덤 버튼'로 넘어가세요.</h3>
+                    <div class="native">
+                        <div class="device_cont">
+                            <div class="device_nav">
+                                <ul>
+                                    <li class="on"></li>
+                                    <li></li>
+                                    <li></li>
+                                    <li></li>
+                                </ul>
+                                <span class="bar"></span>
+                            </div>
+                            <ul class="img">
+                                <li><img src="assets/img/m/img_device_section04_cont01.png" alt=""></li>
+                                <li><img src="assets/img/m/img_device_section04_cont02.png" alt=""></li>
+                                <li><img src="assets/img/m/img_device_section04_cont03.png" alt=""></li>
+                                <li><img src="assets/img/m/img_device_section04_cont04.png" alt=""></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <a href="#none" class="arrow_prev">왼쪽</a>
+                    <a href="#none" class="arrow_next">오른쪽</a>
+                </div
+            </div>
+        </section>
+
+        <!-- 세상 모든게 다 귀찮다면 슈퍼 랜덤 버튼 -->
+        <section id="section06">
+            <div class="cont">
+                <div class="txt">
+                    <h2 role="text">세상 모든게 다 귀찮다면<br>슈퍼 랜덤 버튼</h2>
+                    <p role="text">콘텐츠가 너~~무 많아서 무엇을 볼 지 모를 때<br>슈퍼 랜덤 버튼을 계속 눌러보세요!<br>여러분의 취향을 저격할 콘텐츠가 랜덤으로<br> 끊임없이 무제한 제공됩니다.</p>
+                </div>
+
+                <div class="device">
+                    <h3 class="blind">슈퍼피드 화면 예시 입니다. 다음 섹션인 'CONTACT'로 넘어가세요.</h3>
+                    <div class="native">
+                        <div class="device_cont">
+                            <ul>
+                                <li><img src="assets/img/m/img_device_section05_cont01.png" alt=""></li>
+                                <li><img src="assets/img/m/img_device_section05_cont02.png" alt=""></li>
+                                <li><img src="assets/img/m/img_device_section05_cont03.png" alt=""></li>
+                                <li><img src="assets/img/m/img_device_section05_cont04.png" alt=""></li>
+                                <li><img src="assets/img/m/img_device_section05_cont05.png" alt=""></li>
+                                <li><img src="assets/img/m/img_device_section05_cont06.png" alt=""></li>
+                                <li><img src="assets/img/m/img_device_section05_cont07.png" alt=""></li>
+                                <li><img src="assets/img/m/img_device_section05_cont08.png" alt=""></li>
+                                <li><img src="assets/img/m/img_device_section05_cont09.png" alt=""></li>
+                                <li><img src="assets/img/m/img_device_section05_cont10.png" alt=""></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <a href="#none" class="random" thpe="button">랜덤버튼</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- 지도 -->
+        <section id="contact">
+            <div class="txt">
+                <h2>CONTACT</h2>
+                <p class="disc">슈퍼피드 콘텐츠 큐레이션 분야에서 가장<br>빠른 속도로 성장하는 모바일 스타트업입니다.<br>저희는 슈퍼피드 이전에 B2B 광고 플랫폼<br>사업으로 한 번의 성공을 경험한 회사로<br>두 번째 성공을 위해 차근히 단계를 밟아<br>가는 중입니다.</p>
+                <p class="address">서울특별시 강남구 논현로 416 4층</p>
+            </div>
+
+            <div id="map-canvas" class="map"></div>
+        </section>
+
+        <!-- footer -->
+        <footer id="footer">
+            <h1 class="logo"><img src="assets/img/m/img_logo.png" alt="SUPER FEED"></h1>
+
+            <div class="cont">
+                <div class="store">
+                    <a href="https://play.google.com/store/apps/details?id=com.superfeed.android" target="_blank" title="구글 플레이스토어 다운로드 페이지 이동"><img src="assets/img/m/img_app_googleplay02.png" alt="Google Play"></a>
+                    <a href="https://itunes.apple.com/kr/app/id1058149651?mt=8" target="_blank" title="애플 앱스토어 다운로드 페이지 이동"><img src="assets/img/m/img_app_appstore02.png" alt="App Store"></a>
+                </div>
+
+                <ul class="link">
+                    <li class="facebook"><a href="https://www.facebook.com/Superfeed.co.kr" target="_blank" title="해당페이지로 이동"><img src="assets/img/m/link_facebook.png" alt="페이스북"></a></li>
+                    <li class="youtube"><a href="https://www.youtube.com/channel/UCQkkDz9WWsqTvk_A358KdLw" target="_blank" title="해당페이지로 이동"><img src="assets/img/m/link_youtube.png" alt="유튜브"></a></li>
+                </ul>
+
+                <ul class="link2 flexSb">
+                    <li><a href="mailto:superfeedmkt@superfeed.co.kr" title="해당페이지로 이동">광고문의</a></li>
+                    <li><a href="mailto:superfeedmkt@superfeed.co.kr" title="해당페이지로 이동">제휴문의</a></li>
+                    <li><a href="mailto:help@superfeed.co.kr" title="해당페이지로 이동">고객센터</a></li>
+                </ul>
+                
+                <small class="copy">Copyright &copy; 2016 <b>NVISTA.</b> all Rights Reserved.</small>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>
